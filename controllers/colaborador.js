@@ -47,11 +47,22 @@ const login_colaborador_admin = async (req, res) => {
   } else {
     res.status(200).send({ data: undefined, mensage: " No se encontro el correo electronico" })
   }
+}
 
+
+const listar_colaboradores_admin = async (req, res) => {
+  if (req.user) {
+
+    let colaboradores = await Colaborador.find()
+    res.status(200).send({msg:"lista de colaboradores" ,colaboradores})
+  } else {
+    res.status(200).send({ data: undefined, mensage: " no se puede acceder" })
+  }
 }
 
 module.exports = {
   registro_colaborador_admin,
-  login_colaborador_admin
+  login_colaborador_admin,
+  listar_colaboradores_admin
 }
 
