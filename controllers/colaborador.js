@@ -1,5 +1,6 @@
 const Colaborador = require('../models/colaborador')
 const bcrypt = require('bcrypt-nodejs');
+const jwt = require('../helpers/jwt')
 
 const registro_colaborador_admin = async (req, res) => {
   let data = req.body
@@ -20,10 +21,31 @@ const registro_colaborador_admin = async (req, res) => {
       }
     })
   }
+}
+
+const login_colaborador_admin = async (req, res) => {
+  let data = req.body
+  const colaboradores = await Colaborador.find({ email: data.email })
+
+  if (colaboradores.length >= 1) {
+    bcrypt.compare(data.password, colaboradores[0].password, (error, check) => {
+
+      if (check) {
+        res.status(200).send({ token: jwt.createToken(colaboradores[0]),
+          colaborador:colaboradores[0]
+        })
+      } else {
+        res.status(200).send({ data: undefined, mensage: " Contrasena incorrecta" })
+      }
+    })
+  } else {
+    res.status(200).send({ data: undefined, mensage: " No se encontro el correo electronico" })
+  }
 
 }
 
 module.exports = {
-  registro_colaborador_admin
+  registro_colaborador_admin,
+  login_colaborador_admin
 }
 
