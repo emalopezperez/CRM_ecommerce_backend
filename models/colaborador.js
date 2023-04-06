@@ -28,11 +28,15 @@ const ColaboradorScheme = new mongoose.Schema(
       require: true,
       trim: true
     },
+    estado: {
+      type: Boolean,
+      default: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
   },
-  {
-    timestamps: true,
-    versionKey: false
-  }
 )
 
 module.exports = mongoose.model("colaborador", ColaboradorScheme)
