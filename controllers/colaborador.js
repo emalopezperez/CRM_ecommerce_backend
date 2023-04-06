@@ -9,22 +9,22 @@ const registro_colaborador_admin = async (req, res) => {
     let colaboradores = await Colaborador.find({ email: data.email })
 
     if (colaboradores.length >= 1) {
-      res.status(200).send({ data: undefined, mensage: " El correo electronico ya esta registrado" })
+      res.status(409).send({ data: undefined, message: "El correo electrónico ya está registrado" })
     } else {
       bcrypt.hash('123456', null, null, async (error, hash) => {
         if (error) {
-          res.status(200).send({ data: undefined, mensage: " No se pudo encriptar la contrasena" })
+          res.status(500).send({ data: undefined, message: "No se pudo encriptar la contraseña" })
         } else {
           console.log(hash)
           data.password = hash; // actualiza el valor de data.password
           let colaborador = await Colaborador.create(data)
 
-          res.status(200).send({ data: colaborador })
+          res.status(201).send({ data: colaborador })
         }
       })
     }
   } else {
-    res.status(500).send({ data: undefined, mensage: " Error token" })
+    res.status(401).send({ data: undefined, message: "Error de autenticación del token" })
   }
 }
 
@@ -41,22 +41,30 @@ const login_colaborador_admin = async (req, res) => {
           colaborador: colaboradores[0]
         })
       } else {
-        res.status(200).send({ data: undefined, mensage: " Contrasena incorrecta" })
+        res.status(401).send({ data: undefined, message: "Contraseña incorrecta" })
       }
     })
   } else {
-    res.status(200).send({ data: undefined, mensage: " No se encontro el correo electronico" })
+    res.status(404).send({ data: undefined, message: "No se encontró el correo electrónico" })
   }
 }
 
-
 const listar_colaboradores_admin = async (req, res) => {
+
   if (req.user) {
 
-    let colaboradores = await Colaborador.find()
-    res.status(200).send({msg:"lista de colaboradores" ,colaboradores})
+    let filtro = req.params['filtro'];
+
+    let colaboradores = await Colaborador.find({
+      $or: [
+        { nombres: new RegExp(filtro, 'i') },
+        { apellidos: new RegExp(filtro, 'i') },
+        { email: new RegExp(filtro, 'i') },
+      ]
+    });
+    res.status(200).send({ message: "Lista de colaboradores", colaboradores })
   } else {
-    res.status(200).send({ data: undefined, mensage: " no se puede acceder" })
+    res.status(401).send({ data: undefined, message: "No se puede acceder sin autenticación" })
   }
 }
 
@@ -65,4 +73,3 @@ module.exports = {
   login_colaborador_admin,
   listar_colaboradores_admin
 }
-
