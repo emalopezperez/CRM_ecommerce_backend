@@ -108,11 +108,40 @@ const editar_colaborador_admin = async (req, res) => {
   }
 }
 
+const cambiar_estado_colaborador_admin = async (req, res) => {
+  if (req.user) {
+    let id = req.params['id'];
+    let data = req.body
+
+    let nuevo_estado_colaborador = false
+
+    if(data.estado){
+      nuevo_estado_colaborador = false
+    }else{
+      nuevo_estado_colaborador = true
+    }
+
+    try {
+      let colaborador_nuevo_estado = await Colaborador.findByIdAndUpdate(id, {
+        estado: nuevo_estado_colaborador,
+      }, { new: true })
+
+      res.status(200).send({ data: colaborador_nuevo_estado})
+
+    } catch (error) {
+      res.status(401).send({ msg: 'error' })
+    }
+
+  } else {
+    res.status(401).send({ msg: 'error' })
+  }
+}
 
 module.exports = {
   registro_colaborador_admin,
   login_colaborador_admin,
   listar_colaboradores_admin,
   obtener_colaborador_admin,
-  editar_colaborador_admin
+  editar_colaborador_admin,
+  cambiar_estado_colaborador_admin
 }
