@@ -1,6 +1,7 @@
 const Colaborador = require('../models/colaborador')
 const bcrypt = require('bcrypt-nodejs');
-const jwt = require('../helpers/jwt')
+const jwt = require('../helpers/jwt');
+const { trusted } = require('mongoose');
 
 const registro_colaborador_admin = async (req, res) => {
 
@@ -50,7 +51,6 @@ const login_colaborador_admin = async (req, res) => {
 }
 
 const listar_colaboradores_admin = async (req, res) => {
-
   if (req.user) {
 
     let filtro = req.params['filtro'];
@@ -68,8 +68,51 @@ const listar_colaboradores_admin = async (req, res) => {
   }
 }
 
+const obtener_colaborador_admin = async (req, res) => {
+  if (req.user) {
+    let id = req.params['id'];
+
+    try {
+      let colaborador = await Colaborador.findById({ _id: id });
+      res.status(200).send({ data: colaborador })
+    } catch (error) {
+      res.status(401).send({ msg: 'error' })
+    }
+
+  } else {
+    res.status(401).send({ msg: 'error' })
+  }
+}
+
+const editar_colaborador_admin = async (req, res) => {
+  if (req.user) {
+    let id = req.params['id'];
+    let data = req.body
+
+    try {
+      let colaborador_editado = await Colaborador.findByIdAndUpdate(id, {
+        nombre: data.nombre,
+        apellido: data.apellido,
+        rol: data.rol,
+        email: data.email
+      }, { new: true })
+
+      res.status(200).send({ data: colaborador_editado })
+
+    } catch (error) {
+      res.status(401).send({ msg: 'error' })
+    }
+
+  } else {
+    res.status(401).send({ msg: 'error' })
+  }
+}
+
+
 module.exports = {
   registro_colaborador_admin,
   login_colaborador_admin,
-  listar_colaboradores_admin
+  listar_colaboradores_admin,
+  obtener_colaborador_admin,
+  editar_colaborador_admin
 }
