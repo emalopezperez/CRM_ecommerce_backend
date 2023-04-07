@@ -1,7 +1,6 @@
 const Colaborador = require('../models/colaborador')
 const bcrypt = require('bcrypt-nodejs');
 const jwt = require('../helpers/jwt');
-const { trusted } = require('mongoose');
 
 const registro_colaborador_admin = async (req, res) => {
 
@@ -34,17 +33,22 @@ const login_colaborador_admin = async (req, res) => {
   const colaboradores = await Colaborador.find({ email: data.email })
 
   if (colaboradores.length >= 1) {
-    bcrypt.compare(data.password, colaboradores[0].password, (error, check) => {
 
-      if (check) {
-        res.status(200).send({
-          token: jwt.createToken(colaboradores[0]),
-          colaborador: colaboradores[0]
-        })
-      } else {
-        res.status(401).send({ data: undefined, message: "Contraseña incorrecta" })
-      }
-    })
+    if (colaboradores[0].estado) {
+      bcrypt.compare(data.password, colaboradores[0].password, async function (err, check) {
+        if (check) {
+          res.status(200).send({
+            token: jwt.createToken(colaboradores[0]),
+            usuario: colaboradores[0]
+          });
+        } else {
+          res.status(200).send({ data: undefined, message: 'La contraseña es incorrecta.' });
+        }
+
+      });
+    } else {
+      res.status(200).send({ data: undefined, message: 'Su cuenta esta desactivada.' });
+    }
   } else {
     res.status(404).send({ data: undefined, message: "No se encontró el correo electrónico" })
   }
@@ -115,9 +119,9 @@ const cambiar_estado_colaborador_admin = async (req, res) => {
 
     let nuevo_estado_colaborador = false
 
-    if(data.estado){
+    if (data.estado) {
       nuevo_estado_colaborador = false
-    }else{
+    } else {
       nuevo_estado_colaborador = true
     }
 
@@ -126,7 +130,7 @@ const cambiar_estado_colaborador_admin = async (req, res) => {
         estado: nuevo_estado_colaborador,
       }, { new: true })
 
-      res.status(200).send({ data: colaborador_nuevo_estado})
+      res.status(200).send({ data: colaborador_nuevo_estado })
 
     } catch (error) {
       res.status(401).send({ msg: 'error' })
