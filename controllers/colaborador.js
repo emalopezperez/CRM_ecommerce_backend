@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt-nodejs');
 const jwt = require('../helpers/jwt');
 
 const registro_colaborador_admin = async (req, res) => {
-
   if (req.user) {
     let data = req.body
     let colaboradores = await Colaborador.find({ email: data.email })
@@ -33,7 +32,6 @@ const login_colaborador_admin = async (req, res) => {
   const colaboradores = await Colaborador.find({ email: data.email })
 
   if (colaboradores.length >= 1) {
-
     if (colaboradores[0].estado) {
       bcrypt.compare(data.password, colaboradores[0].password, async function (err, check) {
         if (check) {

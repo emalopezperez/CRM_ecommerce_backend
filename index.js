@@ -6,6 +6,7 @@ const cors = require("cors")
 
 const cliente_router = require('./routes/cliente')
 const colaborador_router= require('./routes/colaborador')
+const producto_router = require('./routes/producto')
 
 // Conecion DB
 connection();
@@ -36,6 +37,7 @@ app.use(cors())
 
 app.use('/api',cliente_router )
 app.use('/api',colaborador_router)
+app.use('/api',producto_router)
 
 app.listen(port, () => {
   console.log("Servidor corriendo en el puerto" + ' ' + port)
