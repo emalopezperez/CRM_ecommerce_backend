@@ -1,11 +1,11 @@
 Descripción del Proyecto
 
-		Este proyecto se centra en el desarrollo de un backend para dos aplicaciones complementarias.
-		La primera de ellas es un ecommerce completo, que ofrece a los usuarios un registro seguro, un carrito de compras intuitivo,
-		pagos confiables mediante Mercado Pago y todas las características necesarias para una experiencia de compra satisfactoria.
-		La segunda aplicación es un panel de administración, que permite a los colaboradores registrarse y acceder a una variedad de
-		roles que les otorgan la capacidad de administrar la tienda en línea, desde la gestión de productos hasta el control de inventario.
-		En resumen, este proyecto busca ofrecer una solución completa para la gestión de un negocio en línea exitoso.
+    Este proyecto se centra en el desarrollo de un backend para dos aplicaciones complementarias.
+    La primera de ellas es un ecommerce completo, que ofrece a los usuarios un registro seguro, un carrito de compras intuitivo,
+    pagos confiables mediante Mercado Pago y todas las características necesarias para una experiencia de compra satisfactoria.
+    La segunda aplicación es un panel de administración, que permite a los colaboradores registrarse y acceder a una variedad de
+    roles que les otorgan la capacidad de administrar la tienda en línea, desde la gestión de productos hasta el control de inventario.
+    En resumen, este proyecto busca ofrecer una solución completa para la gestión de un negocio en línea exitoso.
 
  El proyecto cuenta con las siguientes características:
 
