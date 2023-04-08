@@ -1,5 +1,7 @@
 const Producto = require('../models/producto');
 const slugify = require('slugify')
+const fs = require('fs')
+const path = require('path')
 
 const registro_producto_admin = async function (req, res) {
   if (req.user) {
@@ -31,7 +33,6 @@ const registro_producto_admin = async function (req, res) {
 
 const listar_productos_admin = async (req, res) => {
   if (req.user) {
-
     let filtro = req.params['filtro'];
 
     let productos = await Producto.find({
@@ -46,7 +47,29 @@ const listar_productos_admin = async (req, res) => {
   }
 }
 
+const obtener_portada_producto = async (req, res) => {
+  // Obtenemos el nombre de la imagen de portada del producto a través del parámetro 'img' de la solicitud
+  let img = req.params['img'];
+
+  // Utilizamos el método 'fs.stat' para verificar si la imagen existe en la carpeta 'uploads/productos/'
+  fs.stat('./uploads/productos/' + img, function (err) {
+    if (err) {
+      // Si la imagen no existe, establecemos la ruta de una imagen predeterminada como portada
+      let path_img = './uploads/default.jpg';
+      // Enviamos la imagen predeterminada como respuesta con un estado HTTP 200
+      res.status(200).sendFile(path.resolve(path_img));
+    } else {
+      // Si la imagen existe, establecemos la ruta de la imagen correspondiente como portada
+      let path_img = './uploads/productos/' + img;
+      // Enviamos la imagen correspondiente como respuesta con un estado HTTP 200
+      res.status(200).sendFile(path.resolve(path_img));
+    }
+  });
+}
+
+
 module.exports = {
   registro_producto_admin,
-  listar_productos_admin
+  listar_productos_admin,
+  obtener_portada_producto
 }
