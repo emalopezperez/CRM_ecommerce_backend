@@ -29,6 +29,24 @@ const registro_producto_admin = async function (req, res) {
   }
 }
 
+const listar_productos_admin = async (req, res) => {
+  if (req.user) {
+
+    let filtro = req.params['filtro'];
+
+    let productos = await Producto.find({
+      $or: [
+        { titulo: new RegExp(filtro, 'i') },
+        { categoria: new RegExp(filtro, 'i') },
+      ]
+    });
+    res.status(200).send({ message: "Lista de productos", productos })
+  } else {
+    res.status(401).send({ data: undefined, message: "No se puede encontrar el producto" })
+  }
+}
+
 module.exports = {
-  registro_producto_admin
+  registro_producto_admin,
+  listar_productos_admin
 }
