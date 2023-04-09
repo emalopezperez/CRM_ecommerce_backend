@@ -83,9 +83,50 @@ const obtener_producto_admin = async (req, res) => {
   }
 }
 
+const editar_producto_admin = async (req, res) => {
+  try {
+    if (!req.user) {
+      throw new Error('No se ha iniciado sesión');
+    }
+
+    const data = req.body;
+    const id = req.params['id'];
+
+    const productoExistente = await Producto.findOne({ titulo: data.titulo });
+    if (productoExistente && productoExistente._id.toString() !== id) {
+      throw new Error('El titulo del producto ya existe.');
+    }
+
+    let producto = await Producto.findOneAndUpdate({ _id: id }, {
+      titulo: data.titulo,
+      categoria: data.categoria,
+      precio: data.precio,
+      estado: data.estado,
+      descuento: data.descuento,
+      descripcion: data.descripcion,
+    }, { new: true, runValidators: true });
+
+    if (req.files && req.files.portada && req.files.portada.path) {
+      const img_path = req.files.portada.path;
+      const str_img = img_path.split('\\');
+      const str_portada = str_img[2];
+      producto.portada = str_portada;
+      await producto.save();
+    }
+
+    res.status(200).send({ data: producto, message: 'Producto actualizado correctamente' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(400).send({ data: undefined, message: error.message });
+  }
+};
+
+
 module.exports = {
   registro_producto_admin,
   listar_productos_admin,
-  obtener_portada_producto
-  ,obtener_producto_admin
+  obtener_portada_producto,
+  obtener_producto_admin,
+  editar_producto_admin
 }
