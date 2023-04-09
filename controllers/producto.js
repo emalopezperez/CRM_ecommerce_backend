@@ -67,9 +67,25 @@ const obtener_portada_producto = async (req, res) => {
   });
 }
 
+const obtener_producto_admin = async (req, res) => {
+  if (req.user) {
+    let id = req.params['id'];
+
+    try {
+      let producto = await Producto.findById({ _id: id });
+      res.status(200).send({ data: producto })
+    } catch (error) {
+      res.status(401).send({ msg: 'error' })
+    }
+
+  } else {
+    res.status(401).send({ msg: 'error' })
+  }
+}
 
 module.exports = {
   registro_producto_admin,
   listar_productos_admin,
   obtener_portada_producto
+  ,obtener_producto_admin
 }
