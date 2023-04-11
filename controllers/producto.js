@@ -1,7 +1,9 @@
 const Producto = require('../models/producto');
+const Variedad = require('../models/variedad');
 const slugify = require('slugify')
 const fs = require('fs')
-const path = require('path')
+const path = require('path');
+
 
 const registro_producto_admin = async function (req, res) {
   if (req.user) {
@@ -103,6 +105,7 @@ const editar_producto_admin = async (req, res) => {
       precio: data.precio,
       estado: data.estado,
       descuento: data.descuento,
+      str_variedad: data.str_variedad,
       descripcion: data.descripcion,
     }, { new: true, runValidators: true });
 
@@ -122,11 +125,30 @@ const editar_producto_admin = async (req, res) => {
   }
 };
 
+registro_variedad_producto = async (req, res) => {
+  if (req.user) {
+    let data = req.body
+
+    console.log(data)
+    try {
+      let variedad = await Variedad.create(data)
+      res.status(200).send({ data: variedad })
+
+    } catch (error) {
+      console.error(error);
+      res.status(400).send({ data: undefined, message: error.message });
+    }
+
+  } else {
+    res.status(401).send({ msg: 'error' })
+  }
+}
 
 module.exports = {
   registro_producto_admin,
   listar_productos_admin,
   obtener_portada_producto,
   obtener_producto_admin,
-  editar_producto_admin
+  editar_producto_admin,
+  registro_variedad_producto
 }
