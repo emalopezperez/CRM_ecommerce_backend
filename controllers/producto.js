@@ -125,7 +125,7 @@ const editar_producto_admin = async (req, res) => {
   }
 };
 
-registro_variedad_producto = async (req, res) => {
+const registro_variedad_producto = async (req, res) => {
   if (req.user) {
     let data = req.body
 
@@ -144,11 +144,25 @@ registro_variedad_producto = async (req, res) => {
   }
 }
 
+
+const obtener_variedad_producto = async function (req, res) {
+  if (req.user) {
+
+    let id = req.params['id'];
+    let variedades = await Variedad.find({ producto: id }).sort({ stock: -1 });
+    res.status(200).send(variedades);
+
+  } else {
+    res.status(500).send({ data: undefined, message: 'ErrorToken' });
+  }
+}
+
 module.exports = {
   registro_producto_admin,
   listar_productos_admin,
   obtener_portada_producto,
   obtener_producto_admin,
   editar_producto_admin,
-  registro_variedad_producto
+  registro_variedad_producto,
+  obtener_variedad_producto
 }
