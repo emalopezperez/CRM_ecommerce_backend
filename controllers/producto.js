@@ -157,6 +157,20 @@ const obtener_variedad_producto = async function (req, res) {
   }
 }
 
+
+const eliminar_variedad_producto = async function (req, res) {
+  if (req.user) {
+
+    let id = req.params['id'];
+    let variedad = await Variedad.findByIdAndRemove({ _id: id })
+    res.status(200).send(variedad);
+
+  } else {
+    res.status(500).send({ data: undefined, message: 'ErrorToken' });
+  }
+}
+
+
 module.exports = {
   registro_producto_admin,
   listar_productos_admin,
@@ -164,5 +178,6 @@ module.exports = {
   obtener_producto_admin,
   editar_producto_admin,
   registro_variedad_producto,
-  obtener_variedad_producto
+  obtener_variedad_producto,
+  eliminar_variedad_producto
 }
