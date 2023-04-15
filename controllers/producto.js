@@ -157,28 +157,27 @@ const obtener_variedad_producto = async function (req, res) {
   }
 }
 
-
 const eliminar_variedad_producto = async function (req, res) {
   if (req.user) {
 
     let id = req.params['id'];
 
-    let reg = await Variedad.findById({ _id: id });
+    try {
+      let reg = await Variedad.findById({ _id: id });
 
-    if (reg.stock == 0) {
-      let variedad = await Variedad.findOneAndRemove({ _id: id });
-      res.status(200).send(variedad);
-    } else {
-      res.status(200).send({ data: undefined, message: 'No se puede eliminar esta variedad' });
+      if (reg.stock == 0) {
+        let variedad = await Variedad.findOneAndRemove({ _id: id });
+        res.status(200).send(variedad);
+      } else {
+        res.status(200).send({ data: undefined, message: 'No se puede eliminar esta variedad' });
+      }
+    } catch (error) {
+      console.log(error)
     }
-
-
-
   } else {
     res.status(500).send({ data: undefined, message: 'ErrorToken' });
   }
 }
-
 
 
 module.exports = {

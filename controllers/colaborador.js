@@ -64,7 +64,7 @@ const listar_colaboradores_admin = async (req, res) => {
         { email: new RegExp(filtro, 'i') },
       ]
     });
-    res.status(200).send({ message: "Lista de colaboradores", colaboradores })
+    res.status(200).send({ colaboradores })
   } else {
     res.status(401).send({ data: undefined, message: "No se puede acceder sin autenticación" })
   }
@@ -76,7 +76,7 @@ const obtener_colaborador_admin = async (req, res) => {
 
     try {
       let colaborador = await Colaborador.findById({ _id: id });
-      res.status(200).send({ data: colaborador })
+      res.status(200).send({ colaborador })
     } catch (error) {
       res.status(401).send({ msg: 'error' })
     }
@@ -89,26 +89,41 @@ const obtener_colaborador_admin = async (req, res) => {
 const editar_colaborador_admin = async (req, res) => {
   if (req.user) {
     let id = req.params['id'];
-    let data = req.body
+    let data = req.body;
+    let updateFields = {}; // objeto vacío para agregar dinámicamente los campos que se desean actualizar
+
+    if (data.nombre) {
+      updateFields.nombre = data.nombre;
+    }
+
+    if (data.apellido) {
+      updateFields.apellido = data.apellido;
+    }
+
+    if (data.rol) {
+      updateFields.rol = data.rol;
+    }
+
+    if (data.email) {
+      updateFields.email = data.email;
+    }
 
     try {
       let colaborador_editado = await Colaborador.findByIdAndUpdate(id, {
-        nombre: data.nombre,
-        apellido: data.apellido,
-        rol: data.rol,
-        email: data.email
-      }, { new: true })
+        $set: updateFields
+      }, { new: true });
 
-      res.status(200).send({ data: colaborador_editado })
+      res.status(200).send({ data: colaborador_editado });
 
     } catch (error) {
-      res.status(401).send({ msg: 'error' })
+      res.status(401).send({ msg: 'error' });
     }
 
   } else {
-    res.status(401).send({ msg: 'error' })
+    res.status(401).send({ msg: 'error' });
   }
-}
+};
+
 
 const cambiar_estado_colaborador_admin = async (req, res) => {
   if (req.user) {
