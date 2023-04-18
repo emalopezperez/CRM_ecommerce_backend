@@ -42,12 +42,12 @@ const login_colaborador_admin = async (req, res) => {
         } else {
           res.status(200).send({ data: undefined, message: 'La contraseña es incorrecta.' });
         }
-
       });
     } else {
-      res.status(200).send({ data: undefined, message: 'Su cuenta esta desactivada.' });
+      res.status(404).send({ data: undefined, message: 'Su cuenta esta desactivada.' });
     }
-  } else {
+  }
+  else {
     res.status(404).send({ data: undefined, message: "No se encontró el correo electrónico" })
   }
 }
@@ -130,7 +130,7 @@ const cambiar_estado_colaborador_admin = async (req, res) => {
     let id = req.params['id'];
     let data = req.body;
 
-    let nuevo_estado_colaborador = data.estado; 
+    let nuevo_estado_colaborador = data.estado;
 
     try {
       let colaborador_nuevo_estado = await Colaborador.findByIdAndUpdate(id, {
@@ -147,6 +147,8 @@ const cambiar_estado_colaborador_admin = async (req, res) => {
     res.status(401).send({ msg: 'error' })
   }
 }
+
+
 
 module.exports = {
   registro_colaborador_admin,
