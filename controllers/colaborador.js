@@ -8,7 +8,7 @@ const registro_colaborador_admin = async (req, res) => {
     let colaboradores = await Colaborador.find({ email: data.email })
 
     if (colaboradores.length >= 1) {
-      res.status(409).send({ data: undefined, message: "El correo electrónico ya está registrado" })
+      res.status(400).send({ data: undefined, message: "Error, el correo electrónico ya está registrado" })
     } else {
       bcrypt.hash('123456', null, null, async (error, hash) => {
         if (error) {
@@ -18,7 +18,7 @@ const registro_colaborador_admin = async (req, res) => {
           data.password = hash; // actualiza el valor de data.password
           let colaborador = await Colaborador.create(data)
 
-          res.status(201).send({ data: colaborador })
+          res.status(201).send({ data: colaborador , message: "Colaborador registrado correctamente" })
         }
       })
     }
@@ -37,18 +37,19 @@ const login_colaborador_admin = async (req, res) => {
         if (check) {
           res.status(200).send({
             token: jwt.createToken(colaboradores[0]),
-            usuario: colaboradores[0]
+            usuario: colaboradores[0],
+            menssage: "Logeado correctamente"
           });
         } else {
-          res.status(200).send({ data: undefined, message: 'La contraseña es incorrecta.' });
+          res.status(400).send({ data: undefined, message: 'La contraseña es incorrecta.' });
         }
       });
     } else {
-      res.status(404).send({ data: undefined, message: 'Su cuenta esta desactivada.' });
+      res.status(400).send({ data: undefined, message: 'Su cuenta esta desactivada.' });
     }
   }
   else {
-    res.status(404).send({ data: undefined, message: "No se encontró el correo electrónico" })
+    res.status(400).send({ data: undefined, message: "No se encontró el correo electrónico" })
   }
 }
 

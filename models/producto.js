@@ -2,16 +2,16 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ProductoSchema = Schema({
-    titulo: { type: String, required: true },
-    slug: { type: String, required: true },
-    contenido: { type: String, required: true },
-    categoria: { type: String, required: true },
-    precio: { type: Number, required: true },
-    descripcion: { type: String, required: true },
-    stock: { type: Number, default: 0, required: true },
-    portada: { type: String, required: true },
-    str_variedad: { type: String, required: true },
-    estado: { type: Boolean, required: true },
+    titulo: { type: String, required: false },
+    slug: { type: String, required: false },
+    contenido: { type: String, required: false },
+    categoria: { type: String, required: false },
+    precio: { type: Number, required: false },
+    descripcion: { type: String, required: false },
+    stock: { type: Number, default: 0, required: false },
+    portada: { type: String, required: false },
+    str_variedad: { type: String, required: false },
+    estado: { type: Boolean, required: false },
     descuento: { type: Boolean, required: false },
     updatedAt: { type: Date, required: false },
     createdAt: { type: Date, default: Date.now }

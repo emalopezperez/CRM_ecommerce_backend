@@ -4,7 +4,6 @@ const slugify = require('slugify')
 const fs = require('fs')
 const path = require('path');
 
-
 const registro_producto_admin = async function (req, res) {
   if (req.user) {
     let data = req.body;
@@ -14,18 +13,24 @@ const registro_producto_admin = async function (req, res) {
       res.status(401).send({ data: undefined, message: 'El titulo del producto ya existe.' });
     } else {
       //REGISTRO PRODUCTO
-      const img_path = req.files.portada.path
-      const str_img = img_path.split('\\')
-      const str_portada = str_img[2]
+      let str_portada;
+      if(req.files && req.files.portada){
+        const img_path = req.files.portada.path;
+        const str_img = img_path.split('\\');
+        str_portada = str_img[2];
+      }else{
+        // Si no se proporciona una imagen de portada, establece una imagen predeterminada
+        str_portada = 'default-image.jpg';
+      }
 
-      data.portada = str_portada
-      data.slug = slugify(data.titulo)
+      data.portada = str_portada;
+      data.slug = slugify(data.titulo);
 
       try {
         let producto = await Producto.create(data);
         res.status(200).send({ data: producto, message: 'Productos subidos' })
       } catch (error) {
-        res.status(400).send({ data: undefined, message: messages.join(', ') });
+        res.status(400).send({ data: undefined, message: 'error' });
       }
     }
   } else {

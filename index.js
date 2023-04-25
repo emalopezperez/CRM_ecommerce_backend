@@ -7,6 +7,7 @@ const cors = require("cors")
 const cliente_router = require('./routes/cliente')
 const colaborador_router = require('./routes/colaborador')
 const producto_router = require('./routes/producto')
+const cookieParser = require('cookie-parser');
 
 // Conecion DB
 connection();
@@ -14,6 +15,7 @@ connection();
 // Crear Servidor de node
 const app = express();
 const port = process.env.PORT || 3000
+app.use(cookieParser());
 
 // Convierte los cuerpos de las solicitudes en objetos JSON
 app.use(express.json())
