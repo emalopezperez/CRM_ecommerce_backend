@@ -90,6 +90,7 @@ const obtener_producto_admin = async (req, res) => {
   }
 }
 
+
 const editar_producto_admin = async (req, res) => {
   try {
     if (!req.user) {
@@ -98,6 +99,8 @@ const editar_producto_admin = async (req, res) => {
 
     const data = req.body;
     const id = req.params['id'];
+
+    console.log(data.titulo)
 
     const productoExistente = await Producto.findOne({ titulo: data.titulo });
     if (productoExistente && productoExistente._id.toString() !== id) {
@@ -129,6 +132,7 @@ const editar_producto_admin = async (req, res) => {
     res.status(400).send({ data: undefined, message: error.message });
   }
 };
+
 
 const registro_variedad_producto = async (req, res) => {
   if (req.user) {
