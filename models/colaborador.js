@@ -1,15 +1,15 @@
 const mongoose = require("mongoose")
+const bcrypt = require("bcrypt")
 
 const ColaboradorScheme = new mongoose.Schema(
   {
     nombre: {
       type: String,
       required: true,
-      trim: true
     },
     apellido: {
       type: String,
-      required: true,
+      required: false,
       trim: true
     },
     email: {
@@ -19,15 +19,18 @@ const ColaboradorScheme = new mongoose.Schema(
       lowercase: true,
       trim: true
     },
-    rol: {
-      type: String,
-      required: true,
-    },
+
     password: {
       type: String,
       required: true,
       trim: true
     },
+    roles: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role",
+      },
+    ],
     estado: {
       type: Boolean,
       default: true,
@@ -38,5 +41,14 @@ const ColaboradorScheme = new mongoose.Schema(
     }
   },
 )
+
+ColaboradorScheme.statics.encryptPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+};
+
+ColaboradorScheme.statics.comparePassword = async (password, receivedPassword) => {
+  return await bcrypt.compare(password, receivedPassword)
+}
 
 module.exports = mongoose.model("colaborador", ColaboradorScheme)

@@ -1,57 +1,103 @@
 const Colaborador = require('../models/colaborador')
-const bcrypt = require('bcrypt-nodejs');
-const jwt = require('../helpers/jwt');
+const Roles = require('../models/roles')
+const jwt = require('jsonwebtoken');
 
-const registro_colaborador_admin = async (req, res) => {
-  if (req.user) {
-    let data = req.body
-    let colaboradores = await Colaborador.find({ email: data.email })
 
-    if (colaboradores.length >= 1) {
-      res.status(400).send({ data: undefined, message: "Error, el correo electrónico ya está registrado" })
+const register_user = async (req, res) => {
+  console.log("Datos recibidos del frontend:", req.body);
+  const { email, password, roles, nombre, estado, apellido } = req.body;
+  try {
+    const encryptedPassword = await Colaborador.encryptPassword(password);
+
+    const newUser = new Colaborador({
+      nombre,
+      apellido,
+      email,
+      estado,
+      password: encryptedPassword,
+    });
+
+    if (roles) {
+      const foundRoles = await Roles.find({ name: { $in: roles } });
+
+      newUser.roles = foundRoles.map(role => role._id);
     } else {
-      bcrypt.hash('123456', null, null, async (error, hash) => {
-        if (error) {
-          res.status(500).send({ data: undefined, message: "No se pudo encriptar la contraseña" })
-        } else {
-          console.log(hash)
-          data.password = hash; // actualiza el valor de data.password
-          let colaborador = await Colaborador.create(data)
-
-          res.status(201).send({ data: colaborador , message: "Colaborador registrado correctamente" })
-        }
-      })
+      const role = await Roles.findOne({ name: "user" });
+      newUser.roles = [role._id];
     }
-  } else {
-    res.status(401).send({ data: undefined, message: "Error de autenticación del token" })
+
+    const saveUser = await newUser.save();
+
+    const tokenPayload = {
+      id: saveUser._id,
+      nombre: saveUser.nombre,
+      apellido: saveUser.apellido,
+      email: saveUser.email,
+      estado: saveUser.estado,
+      roles: saveUser.roles
+    };
+
+    const token = jwt.sign(tokenPayload, process.env.JWRSECRET, {
+      expiresIn: 86400,
+    });
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error("Error al registrar el usuario:", error);
+    res.status(500).json({ message: 'Error al registrar el usuario' });
   }
-}
+};
 
-const login_colaborador_admin = async (req, res) => {
-  let data = req.body
-  const colaboradores = await Colaborador.find({ email: data.email })
 
-  if (colaboradores.length >= 1) {
-    if (colaboradores[0].estado) {
-      bcrypt.compare(data.password, colaboradores[0].password, async function (err, check) {
-        if (check) {
-          res.status(200).send({
-            token: jwt.createToken(colaboradores[0]),
-            usuario: colaboradores[0],
-            menssage: "Logeado correctamente"
-          });
-        } else {
-          res.status(400).send({ data: undefined, message: 'La contraseña es incorrecta.' });
-        }
-      });
-    } else {
-      res.status(400).send({ data: undefined, message: 'Su cuenta esta desactivada.' });
+const login = async (req, res) => {
+
+  try {
+    const user = await Colaborador.findOne({ email: req.body.email }).populate('roles')
+
+    if (!user) {
+      return res.status(400).json({ menssage: 'User not found' })
     }
+
+    const matchPassword = await Colaborador.comparePassword(req.body.password, user.password)
+    if (!matchPassword) {
+      return res.status(400).json({ token: null, menssage: 'Invalid password' })
+    }
+
+    const tokenPayload = {
+      id: user._id.toString(),
+      nombre: user.nombre,
+      apellido: user.apellido,
+      email: user.email,
+      estado: user.estado,
+      roles: user.roles,
+    };
+
+    const token = jwt.sign(tokenPayload, process.env.JWRSECRET, {
+      expiresIn: 86400
+    })
+
+    const userInfo = {
+      token,
+      usuario: {
+        id: user._id.toString(),
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
+        estado: user.estado,
+        roles: user.roles,
+      }
+    };
+
+    res.status(200).json(userInfo);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al iniciar sesion' });
+    console.log(error)
   }
-  else {
-    res.status(400).send({ data: undefined, message: "No se encontró el correo electrónico" })
-  }
-}
+
+};
+
+
+
 
 const listar_colaboradores_admin = async (req, res) => {
   if (req.user) {
@@ -152,8 +198,9 @@ const cambiar_estado_colaborador_admin = async (req, res) => {
 
 
 module.exports = {
-  registro_colaborador_admin,
-  login_colaborador_admin,
+  register_user,
+  login,
+
   listar_colaboradores_admin,
   obtener_colaborador_admin,
   editar_colaborador_admin,

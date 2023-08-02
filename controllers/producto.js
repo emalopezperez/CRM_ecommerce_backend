@@ -14,11 +14,11 @@ const registro_producto_admin = async function (req, res) {
     } else {
       //REGISTRO PRODUCTO
       let str_portada;
-      if(req.files && req.files.portada){
+      if (req.files && req.files.portada) {
         const img_path = req.files.portada.path;
         const str_img = img_path.split('\\');
         str_portada = str_img[2];
-      }else{
+      } else {
         // Si no se proporciona una imagen de portada, establece una imagen predeterminada
         str_portada = 'default-image.jpg';
       }
@@ -100,8 +100,6 @@ const editar_producto_admin = async (req, res) => {
     const data = req.body;
     const id = req.params['id'];
 
-    console.log(data.titulo)
-
     const productoExistente = await Producto.findOne({ titulo: data.titulo });
     if (productoExistente && productoExistente._id.toString() !== id) {
       throw new Error('El titulo del producto ya existe.');
@@ -137,11 +135,9 @@ const editar_producto_admin = async (req, res) => {
 const registro_variedad_producto = async (req, res) => {
   if (req.user) {
     let data = req.body
-
-    console.log(data)
     try {
       let variedad = await Variedad.create(data)
-      res.status(200).send({ data: variedad })
+      res.status(200).send({ variedad, message: "Variedad registrada" })
 
     } catch (error) {
       console.error(error);
@@ -156,7 +152,6 @@ const registro_variedad_producto = async (req, res) => {
 
 const obtener_variedad_producto = async function (req, res) {
   if (req.user) {
-
     let id = req.params['id'];
     let variedades = await Variedad.find({ producto: id }).sort({ stock: -1 });
     res.status(200).send(variedades);
